@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-white text-slate-900">
+  <header class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+    <div class="flex items-center gap-2">
+      <mat-icon class="text-blue-600">change_history</mat-icon>
+      <span class="text-lg font-semibold tracking-tight">Pythogorean</span>
+    </div>
+
+    @if (session(); as user) {
+      <div class="flex items-center gap-3">
+        <span class="hidden text-sm text-slate-500 sm:inline">{{ user.email }}</span>
+        <button
+          type="button"
+          (click)="logout()"
+          class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          Sign out
+        </button>
+      </div>
+    } @else {
+      <div class="flex items-center gap-2">
+        <a
+          routerLink="/login"
+          class="rounded-lg px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
+        >
+          Login
+        </a>
+        <a
+          routerLink="/register"
+          class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+        >
+          Register
+        </a>
+      </div>
+    }
+  </header>
+
+  <main class="mx-auto max-w-5xl px-6 py-16">
+    @if (session(); as user) {
+      <div
+        class="mb-12 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4"
+      >
+        <mat-icon class="text-emerald-600">check_circle</mat-icon>
+        <div>
+          <p class="font-medium text-emerald-900">Signed in as {{ user.name }}</p>
+          <p class="text-sm text-emerald-700">
+            You are registered as {{ user.role | lowercase }}. Your classes are next.
+          </p>
+        </div>
+      </div>
+    }
+
+    <div class="text-center">
+      <span
+        class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+      >
+        <mat-icon style="font-size:1rem;width:1rem;height:1rem">qr_code_2</mat-icon>
+        ArUco classroom assessment
+      </span>
+
+      <h1 class="mt-6 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+        Assess every student
+        <span class="text-blue-600">in seconds</span>
+      </h1>
+
+      <p class="mx-auto mt-5 max-w-2xl text-lg text-slate-600">
+        Placeholder copy. Pythogorean reads a room full of printed cards through one camera,
+        scores the answers instantly, and closes the loop between teacher, student and parent.
+      </p>
+
+      @if (!session()) {
+        <div class="mt-9 flex items-center justify-center gap-3">
+          <a
+            routerLink="/register"
+            class="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
+          >
+            Create a teacher account
+          </a>
+          <a
+            routerLink="/login"
+            class="rounded-lg border border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            I already have one
+          </a>
+        </div>
+      }
+    </div>
+
+    <div class="mt-20 grid gap-6 sm:grid-cols-3">
+      @for (highlight of highlights; track highlight.title) {
+        <div class="rounded-xl border border-slate-200 p-6 transition hover:border-blue-300">
+          <mat-icon class="text-blue-600">{{ highlight.icon }}</mat-icon>
+          <h2 class="mt-3 font-semibold text-slate-900">{{ highlight.title }}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ highlight.text }}</p>
+        </div>
+      }
+    </div>
+  </main>
+</div>

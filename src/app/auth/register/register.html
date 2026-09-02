@@ -1,0 +1,116 @@
+<div class="flex min-h-screen flex-col bg-white text-slate-900">
+  <header class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+    <a routerLink="/" class="flex items-center gap-2">
+      <mat-icon class="text-blue-600">change_history</mat-icon>
+      <span class="text-lg font-semibold tracking-tight">Pythogorean</span>
+    </a>
+
+    <a
+      routerLink="/login"
+      class="rounded-lg px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
+    >
+      Login
+    </a>
+  </header>
+
+  <main class="flex flex-1 items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 p-8 shadow-sm">
+      <h1 class="text-2xl font-semibold tracking-tight">Create a teacher account</h1>
+      <p class="mt-2 text-sm text-slate-600">
+        Students are added to a class by their teacher, so they do not register here.
+      </p>
+
+      @if (errorMessage(); as message) {
+        <div
+          class="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        >
+          <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">error_outline</mat-icon>
+          <span>{{ message }}</span>
+        </div>
+      }
+
+      @if (branchesError(); as message) {
+        <div
+          class="mt-6 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">warning_amber</mat-icon>
+          <span>{{ message }}</span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 flex flex-col gap-1">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Full name</mat-label>
+          <input matInput formControlName="name" autocomplete="name" />
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+          @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Branch</mat-label>
+          <mat-select formControlName="branchId">
+            @for (branch of branches(); track branch.id) {
+              <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.branchId.touched && form.controls.branchId.hasError('required')) {
+            <mat-error>Branch is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="new-password" />
+          @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+            <mat-error>Password is required</mat-error>
+          }
+          @if (form.controls.password.touched && form.controls.password.hasError('minlength')) {
+            <mat-error>Use at least 8 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Confirm password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('required')) {
+            <mat-error>Confirm your password</mat-error>
+          }
+        </mat-form-field>
+
+        @if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
+          <p class="-mt-1 mb-2 text-sm text-red-700">Passwords do not match</p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="submitting()"
+          class="mt-2 flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
+        >
+          @if (submitting()) {
+            <mat-spinner diameter="18" strokeWidth="2"></mat-spinner>
+            <span>Creating account</span>
+          } @else {
+            <span>Create account</span>
+          }
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-600">
+        Already registered?
+        <a routerLink="/login" class="font-medium text-blue-700 hover:underline">Sign in</a>
+      </p>
+    </div>
+  </main>
+</div>
