@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ClassList } from './class-list/class-list';
+import { CoreModule } from '../core/core-module';
+import { SharedModule } from '../shared/shared-module';
 import { ClassDetail } from './class-detail/class-detail';
+import { ClassList } from './class-list/class-list';
 
 @NgModule({
   declarations: [ClassList, ClassDetail],
-  imports: [CommonModule],
+  imports: [SharedModule, CoreModule],
 })
 export class ClassManagementModule {}

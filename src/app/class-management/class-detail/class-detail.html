@@ -1,1 +1,132 @@
-<p>class-detail works!</p>
+<div class="min-h-screen bg-white text-slate-900">
+  <app-navbar />
+
+  <main class="mx-auto max-w-4xl px-6 py-12">
+    <a routerLink="/classes" class="text-sm font-medium text-blue-700 hover:underline">
+      ← All classes
+    </a>
+
+    <h1 class="mt-3 text-2xl font-semibold tracking-tight">
+      {{ classSummary()?.name ?? 'Class' }}
+    </h1>
+    <p class="mt-2 text-sm text-slate-600">
+      Each student is given the next free ArUco card automatically, and the vision layer renders the
+      printable image. That number is how the camera recognises them, so hand them the matching card.
+    </p>
+
+    @if (errorMessage(); as message) {
+      <div
+        class="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+      >
+        <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">error_outline</mat-icon>
+        <span>{{ message }}</span>
+      </div>
+    }
+
+    @if (addedMessage(); as message) {
+      <div
+        class="mt-6 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+      >
+        <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">check_circle</mat-icon>
+        <span>{{ message }}</span>
+      </div>
+    }
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="mt-8 grid gap-3 rounded-xl border border-slate-200 p-6 sm:grid-cols-[1fr_1fr_auto]"
+    >
+      <mat-form-field appearance="outline">
+        <mat-label>Student name</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+          <mat-error>Name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+        @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+          <mat-error>Enter a valid email</mat-error>
+        }
+      </mat-form-field>
+
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="mb-5 flex h-14 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-300"
+      >
+        @if (submitting()) {
+          <mat-spinner diameter="18" strokeWidth="2"></mat-spinner>
+        }
+        <span>Add</span>
+      </button>
+    </form>
+
+    @if (loading()) {
+      <p class="mt-6 text-sm text-slate-500">Loading students…</p>
+    } @else if (students().length === 0) {
+      <div class="mt-6 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
+        <mat-icon class="text-slate-400">person_add</mat-icon>
+        <p class="mt-2 text-sm text-slate-600">No students in this class yet.</p>
+      </div>
+    } @else {
+      <div class="mt-6 overflow-hidden rounded-xl border border-slate-200">
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <tr>
+              <th class="px-5 py-3 font-medium">Card</th>
+              <th class="px-5 py-3 font-medium">Name</th>
+              <th class="px-5 py-3 font-medium">Email</th>
+              <th class="px-5 py-3 text-right font-medium">Printable card</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            @for (student of students(); track student.id) {
+              <tr class="transition hover:bg-slate-50">
+                <td class="px-5 py-3">
+                  <span
+                    class="inline-flex h-7 min-w-7 items-center justify-center rounded-md bg-blue-50 px-2 font-mono text-xs font-medium text-blue-700"
+                  >
+                    {{ student.arucoMarkerId ?? '—' }}
+                  </span>
+                </td>
+                <td class="px-5 py-3 font-medium text-slate-900">{{ student.name }}</td>
+                <td class="px-5 py-3 text-slate-600">{{ student.email }}</td>
+                <td class="px-5 py-3 text-right">
+                  @if (student.cardGenerated) {
+                    <button
+                      type="button"
+                      (click)="downloadCard(student)"
+                      [disabled]="busyStudentId() === student.id"
+                      class="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      <mat-icon style="font-size:1rem;width:1rem;height:1rem">download</mat-icon>
+                      Download
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="generateCard(student)"
+                      [disabled]="busyStudentId() === student.id"
+                      class="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700 disabled:bg-blue-300"
+                    >
+                      <mat-icon style="font-size:1rem;width:1rem;height:1rem">auto_awesome</mat-icon>
+                      Generate
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-3 text-sm text-slate-500">
+        {{ students().length }} student{{ students().length === 1 ? '' : 's' }} in this class.
+      </p>
+    }
+  </main>
+</div>

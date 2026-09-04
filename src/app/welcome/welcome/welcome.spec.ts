@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
+import { CoreModule } from '../../core/core-module';
 import { SharedModule } from '../../shared/shared-module';
 import { Welcome } from './welcome';
 
@@ -11,7 +12,7 @@ describe('Welcome', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SharedModule, RouterModule.forRoot([])],
+      imports: [SharedModule, CoreModule, RouterModule.forRoot([])],
       declarations: [Welcome],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();

@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Auth } from '../services/auth';
 
 @Component({
   selector: 'app-navbar',
@@ -6,4 +8,14 @@ import { Component } from '@angular/core';
   styleUrl: './navbar.scss',
   templateUrl: './navbar.html',
 })
-export class Navbar {}
+export class Navbar {
+  private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
+
+  readonly session = this.auth.session;
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/']);
+  }
+}

@@ -1,1 +1,61 @@
-<p>class-list works!</p>
+<div class="min-h-screen bg-white text-slate-900">
+  <app-navbar />
+
+  <main class="mx-auto max-w-3xl px-6 py-12">
+    <h1 class="text-2xl font-semibold tracking-tight">My classes</h1>
+    <p class="mt-2 text-sm text-slate-600">Create a class, then add the students who sit in it.</p>
+
+    @if (errorMessage(); as message) {
+      <div
+        class="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+      >
+        <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">error_outline</mat-icon>
+        <span>{{ message }}</span>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-8 flex items-start gap-3">
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>Class name</mat-label>
+        <input matInput formControlName="name" placeholder="Grade 5 - B" />
+        @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+          <mat-error>Class name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="mt-1 flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+      >
+        @if (submitting()) {
+          <mat-spinner diameter="18" strokeWidth="2"></mat-spinner>
+        }
+        <span>Create</span>
+      </button>
+    </form>
+
+    @if (loading()) {
+      <p class="mt-6 text-sm text-slate-500">Loading your classes…</p>
+    } @else if (items().length === 0) {
+      <div class="mt-6 rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
+        <mat-icon class="text-slate-400">school</mat-icon>
+        <p class="mt-2 text-sm text-slate-600">No classes yet. Create your first one above.</p>
+      </div>
+    } @else {
+      <ul class="mt-6 divide-y divide-slate-200 rounded-xl border border-slate-200">
+        @for (item of items(); track item.id) {
+          <li>
+            <a
+              [routerLink]="['/classes', item.id]"
+              class="flex items-center justify-between px-5 py-4 transition hover:bg-slate-50"
+            >
+              <span class="font-medium">{{ item.name }}</span>
+              <mat-icon class="text-slate-400">chevron_right</mat-icon>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </main>
+</div>
