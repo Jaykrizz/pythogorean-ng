@@ -6,18 +6,18 @@
     </a>
 
     <a
-      routerLink="/login"
-      class="rounded-lg px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
+      routerLink="/"
+      class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
     >
-      Login
+      Dashboard
     </a>
   </header>
 
   <main class="flex flex-1 items-center justify-center px-6 py-12">
     <div class="w-full max-w-md rounded-2xl border border-slate-200 p-8 shadow-sm">
-      <h1 class="text-2xl font-semibold tracking-tight">Create a teacher account</h1>
+      <h1 class="text-2xl font-semibold tracking-tight">Register a person</h1>
       <p class="mt-2 text-sm text-slate-600">
-        Students are added to a class by their teacher, so they do not register here.
+        Add a teacher, student, or parent. They sign in with the email and password you set here.
       </p>
 
       @if (errorMessage(); as message) {
@@ -29,16 +29,39 @@
         </div>
       }
 
-      @if (branchesError(); as message) {
+      @if (successMessage(); as message) {
         <div
-          class="mt-6 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          class="mt-6 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
         >
-          <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">warning_amber</mat-icon>
+          <mat-icon style="font-size:1.125rem;width:1.125rem;height:1.125rem">check_circle</mat-icon>
           <span>{{ message }}</span>
         </div>
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 flex flex-col gap-1">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Role</mat-label>
+          <mat-select formControlName="role">
+            @for (role of roles; track role) {
+              <mat-option [value]="role">{{ role | titlecase }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (form.controls.role.value === 'STUDENT') {
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Class</mat-label>
+            <mat-select formControlName="classId">
+              @for (item of classes(); track item.id) {
+                <mat-option [value]="item.id">{{ item.name }}</mat-option>
+              }
+            </mat-select>
+            @if (classes().length === 0) {
+              <mat-hint>Create a class before registering a student.</mat-hint>
+            }
+          </mat-form-field>
+        }
+
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Full name</mat-label>
           <input matInput formControlName="name" autocomplete="name" />
@@ -59,18 +82,6 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Branch</mat-label>
-          <mat-select formControlName="branchId">
-            @for (branch of branches(); track branch.id) {
-              <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
-            }
-          </mat-select>
-          @if (form.controls.branchId.touched && form.controls.branchId.hasError('required')) {
-            <mat-error>Branch is required</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Password</mat-label>
           <input matInput type="password" formControlName="password" autocomplete="new-password" />
           @if (form.controls.password.touched && form.controls.password.hasError('required')) {
@@ -83,7 +94,12 @@
 
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Confirm password</mat-label>
-          <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          <input
+            matInput
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+          />
           @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('required')) {
             <mat-error>Confirm your password</mat-error>
           }
@@ -91,6 +107,14 @@
 
         @if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
           <p class="-mt-1 mb-2 text-sm text-red-700">Passwords do not match</p>
+        }
+
+        @if (form.controls.role.value === 'PARENT') {
+          <p class="mb-2 text-sm text-slate-500">Family links are added in a later step. This creates the account only.</p>
+        }
+
+        @if (cardUrl(); as url) {
+          <img [src]="url" alt="Student ArUco card" class="mb-4 w-full rounded-xl border border-slate-200" />
         }
 
         <button
@@ -106,11 +130,6 @@
           }
         </button>
       </form>
-
-      <p class="mt-6 text-center text-sm text-slate-600">
-        Already registered?
-        <a routerLink="/login" class="font-medium text-blue-700 hover:underline">Sign in</a>
-      </p>
     </div>
   </main>
 </div>

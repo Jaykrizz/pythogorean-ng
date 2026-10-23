@@ -17,20 +17,12 @@
         </button>
       </div>
     } @else {
-      <div class="flex items-center gap-2">
-        <a
-          routerLink="/login"
-          class="rounded-lg px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
-        >
-          Login
-        </a>
-        <a
-          routerLink="/register"
-          class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
-        >
-          Register
-        </a>
-      </div>
+      <a
+        routerLink="/login"
+        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+      >
+        Login
+      </a>
     }
   </header>
 
@@ -43,10 +35,27 @@
         <div>
           <p class="font-medium text-emerald-900">Signed in as {{ user.name }}</p>
           <p class="text-sm text-emerald-700">
-            You are registered as {{ user.role | lowercase }}. Your classes are next.
+            You are signed in as {{ user.role | lowercase }}.
           </p>
         </div>
       </div>
+
+      @if (user.role === 'TEACHER') {
+        <div class="mb-12 flex flex-wrap gap-3">
+          <a
+            routerLink="/classes"
+            class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
+          >
+            Classes
+          </a>
+          <a
+            routerLink="/register"
+            class="rounded-lg bg-emerald-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
+          >
+            Register a person
+          </a>
+        </div>
+      }
     }
 
     <div class="text-center">
@@ -68,19 +77,16 @@
       </p>
 
       @if (!session()) {
-        <div class="mt-9 flex items-center justify-center gap-3">
-          <a
-            routerLink="/register"
-            class="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
-          >
-            Create a teacher account
-          </a>
+        <div class="mt-9 flex flex-col items-center gap-3">
           <a
             routerLink="/login"
-            class="rounded-lg border border-slate-300 px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            class="rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
           >
-            I already have one
+            Login
           </a>
+          <p class="text-sm text-slate-500">
+            Local teacher: teacher@pythogorean.local / teacher1234
+          </p>
         </div>
       }
     </div>

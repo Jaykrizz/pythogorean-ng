@@ -1,6 +1,5 @@
 import { computed, inject, Service, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { Branch } from '../../auth/models/branch';
 import { LoginRequest } from '../../auth/models/login-request';
 import { LoginResponse } from '../../auth/models/login-response';
 import { RegisterRequest } from '../../auth/models/register-request';
@@ -31,10 +30,6 @@ export class Auth {
 
   register(request: RegisterRequest): Observable<RegisterResponse> {
     return this.api.post<RegisterResponse>('/auth/register', request);
-  }
-
-  getBranches(): Observable<Branch[]> {
-    return this.api.get<Branch[]>('/branches');
   }
 
   logout(): void {

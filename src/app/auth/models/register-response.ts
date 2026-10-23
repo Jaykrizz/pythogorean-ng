@@ -5,4 +5,5 @@ export interface RegisterResponse {
   name: string;
   email: string;
   role: Role;
+  markerId: number | null;
 }

@@ -1,1 +1,67 @@
-<p>class-list works!</p>
+<div class="min-h-screen bg-white text-slate-900">
+  <header class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+    <a routerLink="/" class="flex items-center gap-2">
+      <mat-icon class="text-blue-600">change_history</mat-icon>
+      <span class="text-lg font-semibold tracking-tight">Pythogorean</span>
+    </a>
+    <div class="flex items-center gap-2">
+      <a routerLink="/" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+        Dashboard
+      </a>
+      <button
+        type="button"
+        (click)="logout()"
+        class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      >
+        Sign out
+      </button>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-3xl px-6 py-12">
+    <h1 class="text-3xl font-semibold tracking-tight">Classes</h1>
+    <p class="mt-2 text-sm text-slate-600">A class owns its subjects, and each subject owns its topics.</p>
+
+    @if (errorMessage(); as message) {
+      <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        {{ message }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-start">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>New class</mat-label>
+        <input matInput formControlName="name" placeholder="Grade 10-A" />
+        @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+          <mat-error>Name is required</mat-error>
+        }
+      </mat-form-field>
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-300"
+      >
+        Create class
+      </button>
+    </form>
+
+    @if (loading()) {
+      <p class="mt-8 text-sm text-slate-500">Loading classes</p>
+    } @else if (classes().length === 0) {
+      <p class="mt-8 text-sm text-slate-500">No classes yet.</p>
+    } @else {
+      <ul class="mt-8 divide-y divide-slate-200 rounded-xl border border-slate-200">
+        @for (item of classes(); track item.id) {
+          <li>
+            <a [routerLink]="['/classes', item.id]" class="flex items-center justify-between px-5 py-4 hover:bg-slate-50">
+              <span class="font-medium">{{ item.name }}</span>
+              <span class="text-sm text-slate-500">
+                {{ item.subjectCount }} subjects · {{ item.studentCount }} students
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </main>
+</div>

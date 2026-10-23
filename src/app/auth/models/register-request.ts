@@ -4,6 +4,6 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
-  branchId: number;
   role: Role;
+  classId?: number | null;
 }

@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Classroom } from '../../class-management/classroom';
+import { ClassSummary } from '../../class-management/models';
 import { apiErrorMessage } from '../../core/api-error';
 import { Auth } from '../../core/services/auth';
-import { Branch } from '../models/branch';
+import { Role } from '../models/role';
 
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   const password = group.get('password')?.value;
@@ -18,40 +19,40 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   styleUrl: './register.scss',
   templateUrl: './register.html',
 })
-export class Register implements OnInit {
+export class Register implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly auth = inject(Auth);
-  private readonly router = inject(Router);
+  private readonly classroom = inject(Classroom);
+
+  readonly roles: Role[] = ['TEACHER', 'STUDENT', 'PARENT'];
+  readonly classes = signal<ClassSummary[]>([]);
 
   readonly form = this.formBuilder.nonNullable.group(
     {
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      branchId: [null as number | null, [Validators.required]],
+      role: ['TEACHER' as Role, [Validators.required]],
+      classId: [null as number | null],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: passwordsMatch },
   );
 
-  readonly branches = signal<Branch[]>([]);
-  readonly branchesError = signal<string | null>(null);
   readonly submitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly successMessage = signal<string | null>(null);
+  readonly cardUrl = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.auth.getBranches().subscribe({
-      next: (branches) => {
-        this.branches.set(branches);
-
-        if (branches.length === 0) {
-          this.branchesError.set('No branches exist yet. Add one to the branches table first.');
-        }
-      },
-      error: (error: unknown) => {
-        this.branchesError.set(apiErrorMessage(error, 'Unable to load branches'));
-      },
+    this.classroom.list().subscribe({
+      next: (classes) => this.classes.set(classes),
+      error: () => this.classes.set([]),
     });
+  }
+
+  ngOnDestroy(): void {
+    this.clearCard();
   }
 
   submit(): void {
@@ -62,23 +63,48 @@ export class Register implements OnInit {
 
     this.submitting.set(true);
     this.errorMessage.set(null);
+    this.successMessage.set(null);
 
-    const { name, email, password, branchId } = this.form.getRawValue();
+    const { name, email, password, role, classId } = this.form.getRawValue();
 
-    this.auth
-      .register({
-        name,
-        email,
-        password,
-        branchId: branchId as number,
-        role: 'TEACHER',
-      })
-      .subscribe({
-        next: () => this.router.navigate(['/login']),
-        error: (error: unknown) => {
-          this.errorMessage.set(apiErrorMessage(error, 'Unable to create the account'));
-          this.submitting.set(false);
-        },
-      });
+    if (role === 'STUDENT' && classId == null) {
+      this.errorMessage.set('Choose a class so the student gets a card.');
+      this.submitting.set(false);
+      return;
+    }
+
+    this.auth.register({ name, email, password, role, classId: role === 'STUDENT' ? classId : null }).subscribe({
+      next: (created) => {
+        const cardNote = created.markerId == null ? '' : ` Card marker ${created.markerId}.`;
+        this.successMessage.set(`${created.name} can now sign in as ${created.role.toLowerCase()}.${cardNote}`);
+        this.clearCard();
+        if (created.markerId != null) {
+          this.classroom.card(created.id).subscribe({
+            next: (blob) => this.cardUrl.set(URL.createObjectURL(blob)),
+          });
+        }
+        this.form.reset({
+          name: '',
+          email: '',
+          role: 'TEACHER',
+          classId: null,
+          password: '',
+          confirmPassword: '',
+        });
+        this.submitting.set(false);
+      },
+      error: (error: unknown) => {
+        this.errorMessage.set(apiErrorMessage(error, 'Unable to create the account'));
+        this.submitting.set(false);
+      },
+    });
+  }
+
+  private clearCard(): void {
+    const url = this.cardUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+    this.cardUrl.set(null);
   }
 }

@@ -1,4 +1,9 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, convertToParamMap, RouterModule } from '@angular/router';
+import { SharedModule } from '../../shared/shared-module';
 import { ClassDetail } from './class-detail';
 
 describe('ClassDetail', () => {
@@ -7,7 +12,16 @@ describe('ClassDetail', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [SharedModule, FormsModule, RouterModule.forRoot([])],
       declarations: [ClassDetail],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({ id: '1' }) } },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ClassDetail);
