@@ -26,6 +26,8 @@
     }
   </header>
 
+  <app-teacher-tabs />
+
   <main class="mx-auto max-w-5xl px-6 py-16">
     @if (session(); as user) {
       <div
@@ -41,13 +43,7 @@
       </div>
 
       @if (user.role === 'TEACHER') {
-        <div class="mb-12 flex flex-wrap gap-3">
-          <a
-            routerLink="/classes"
-            class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
-          >
-            Classes
-          </a>
+        <div class="mb-12">
           <a
             routerLink="/register"
             class="rounded-lg bg-emerald-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"

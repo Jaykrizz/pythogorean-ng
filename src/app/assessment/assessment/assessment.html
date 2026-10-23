@@ -1,1 +1,102 @@
-<p>assessment works!</p>
+<div class="min-h-screen bg-white text-slate-900">
+  <header class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+    <a routerLink="/" class="flex items-center gap-2">
+      <mat-icon class="text-blue-600">change_history</mat-icon>
+      <span class="text-lg font-semibold tracking-tight">Pythogorean</span>
+    </a>
+  </header>
+
+  <app-teacher-tabs />
+
+  <main class="mx-auto max-w-3xl px-6 py-12">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight">Assessments</h1>
+        <p class="mt-2 text-sm text-slate-600">A test for one class topic.</p>
+      </div>
+      @if (!creating()) {
+        <button
+          type="button"
+          (click)="openForm()"
+          class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Create assessment
+        </button>
+      }
+    </div>
+
+    @if (errorMessage(); as message) {
+      <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        {{ message }}
+      </div>
+    }
+
+    @if (creating()) {
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-8 rounded-xl border border-slate-200 p-5">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="Motion check" />
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <mat-error>Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Class</mat-label>
+          <mat-select formControlName="classId">
+            @for (item of classes(); track item.id) {
+              <mat-option [value]="item.id">{{ item.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.classId.touched && form.controls.classId.hasError('required')) {
+            <mat-error>Choose a class</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Topic</mat-label>
+          <mat-select formControlName="topicId">
+            @for (topic of topics(); track topic.id) {
+              <mat-option [value]="topic.id">{{ topic.label }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.topicId.touched && form.controls.topicId.hasError('required')) {
+            <mat-error>Choose a topic</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="flex gap-2">
+          <button
+            type="submit"
+            [disabled]="submitting()"
+            class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-300"
+          >
+            Save assessment
+          </button>
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="rounded-lg border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (loading()) {
+      <p class="mt-8 text-sm text-slate-500">Loading assessments</p>
+    } @else if (assessments().length === 0) {
+      <p class="mt-8 text-sm text-slate-500">No assessments yet.</p>
+    } @else {
+      <ul class="mt-8 divide-y divide-slate-200 rounded-xl border border-slate-200">
+        @for (item of assessments(); track item.id) {
+          <li class="px-5 py-4">
+            <p class="font-medium">{{ item.name }}</p>
+            <p class="text-sm text-slate-500">{{ item.className }} · {{ item.subjectName }} / {{ item.topicName }}</p>
+          </li>
+        }
+      </ul>
+    }
+  </main>
+</div>

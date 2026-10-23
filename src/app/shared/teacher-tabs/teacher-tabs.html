@@ -1,0 +1,28 @@
+@if (teacher()) {
+  <nav class="border-b border-slate-200 bg-white px-6">
+    <div class="mx-auto flex max-w-5xl gap-6">
+      <a
+        routerLink="/"
+        routerLinkActive="active-tab"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="border-b-2 border-transparent px-1 py-3 text-sm font-medium text-slate-500"
+      >
+        Dashboard
+      </a>
+      <a
+        routerLink="/classes"
+        routerLinkActive="active-tab"
+        class="border-b-2 border-transparent px-1 py-3 text-sm font-medium text-slate-500"
+      >
+        Classes
+      </a>
+      <a
+        routerLink="/assessments"
+        routerLinkActive="active-tab"
+        class="border-b-2 border-transparent px-1 py-3 text-sm font-medium text-slate-500"
+      >
+        Assessments
+      </a>
+    </div>
+  </nav>
+}

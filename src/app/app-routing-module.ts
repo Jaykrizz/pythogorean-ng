@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Assessment } from './assessment/assessment/assessment';
 import { Login } from './auth/login/login';
 import { Register } from './auth/register/register';
 import { ClassDetail } from './class-management/class-detail/class-detail';
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'register', component: Register, canActivate: [teacherGuard] },
   { path: 'classes', component: ClassList, canActivate: [teacherGuard] },
   { path: 'classes/:id', component: ClassDetail, canActivate: [teacherGuard] },
+  { path: 'assessments', component: Assessment, canActivate: [teacherGuard] },
   { path: '**', redirectTo: '' },
 ];
 

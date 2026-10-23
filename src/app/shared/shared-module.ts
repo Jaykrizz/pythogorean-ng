@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { TeacherTabs } from './teacher-tabs/teacher-tabs';
 
 const SHARED_MODULES = [
   CommonModule,
@@ -20,7 +21,8 @@ const SHARED_MODULES = [
 ];
 
 @NgModule({
+  declarations: [TeacherTabs],
   imports: SHARED_MODULES,
-  exports: SHARED_MODULES,
+  exports: [...SHARED_MODULES, TeacherTabs],
 })
 export class SharedModule {}
