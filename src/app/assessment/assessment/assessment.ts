@@ -20,6 +20,7 @@ export class Assessment implements OnInit {
   readonly assessments = signal<AssessmentItem[]>([]);
   readonly classes = signal<ClassSummary[]>([]);
   readonly topics = signal<TopicChoice[]>([]);
+  readonly topicsReady = signal(false);
   readonly loading = signal(true);
   readonly creating = signal(false);
   readonly submitting = signal(false);
@@ -57,11 +58,11 @@ export class Assessment implements OnInit {
       return;
     }
 
-    const { name, topicId } = this.form.getRawValue();
+    const { name, classId, topicId } = this.form.getRawValue();
     this.submitting.set(true);
     this.errorMessage.set(null);
 
-    this.assessmentsApi.create(name.trim(), topicId as number).subscribe({
+    this.assessmentsApi.create(name.trim(), classId as number, topicId as number).subscribe({
       next: () => {
         this.submitting.set(false);
         this.closeForm();
@@ -90,6 +91,7 @@ export class Assessment implements OnInit {
   private loadTopics(classId: number | null): void {
     this.form.controls.topicId.setValue(null);
     this.topics.set([]);
+    this.topicsReady.set(false);
 
     if (classId == null) {
       return;
@@ -99,14 +101,20 @@ export class Assessment implements OnInit {
       next: (detail) => {
         this.topics.set(
           detail.subjects.flatMap((subject) =>
-            subject.topics.map((topic) => ({
-              id: topic.id,
-              label: `${subject.name} / ${topic.name}`,
-            })),
+            subject.topics
+              .filter((topic) => topic.shown)
+              .map((topic) => ({
+                id: topic.id,
+                label: `${subject.name} / ${topic.name}`,
+              })),
           ),
         );
+        this.topicsReady.set(true);
       },
-      error: () => this.topics.set([]),
+      error: () => {
+        this.topics.set([]);
+        this.topicsReady.set(true);
+      },
     });
   }
 }

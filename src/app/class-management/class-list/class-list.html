@@ -21,8 +21,10 @@
   <app-teacher-tabs />
 
   <main class="mx-auto max-w-3xl px-6 py-12">
+    <app-class-sections />
+
     <h1 class="text-3xl font-semibold tracking-tight">Classes</h1>
-    <p class="mt-2 text-sm text-slate-600">A class owns its subjects, and each subject owns its topics.</p>
+    <p class="mt-2 text-sm text-slate-600">Create a class, then add subjects from Subjects & questions.</p>
 
     @if (errorMessage(); as message) {
       <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">

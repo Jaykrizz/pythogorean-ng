@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, convertToParamMap, RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared-module';
+import { ClassSections } from '../class-sections/class-sections';
 import { ClassDetail } from './class-detail';
 
 describe('ClassDetail', () => {
@@ -12,7 +13,7 @@ describe('ClassDetail', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SharedModule, FormsModule, RouterModule.forRoot([])],
+      imports: [SharedModule, FormsModule, RouterModule.forRoot([]), ClassSections],
       declarations: [ClassDetail],
       providers: [
         provideHttpClient(),

@@ -12,9 +12,11 @@
   <app-teacher-tabs />
 
   <main class="mx-auto max-w-3xl px-6 py-12">
+    <app-class-sections />
+
     @if (detail(); as item) {
       <h1 class="text-3xl font-semibold tracking-tight">{{ item.name }}</h1>
-      <p class="mt-2 text-sm text-slate-600">Subjects and topics live on this class. Each student gets one card.</p>
+      <p class="mt-2 text-sm text-slate-600">Add subjects from the catalog. Topics and questions come with the subject.</p>
 
       @if (errorMessage(); as message) {
         <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -23,45 +25,71 @@
       }
 
       <section class="mt-10">
-        <h2 class="text-lg font-semibold">Subjects and topics</h2>
-        <form [formGroup]="subjectForm" (ngSubmit)="addSubject()" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start">
+        <h2 class="text-lg font-semibold">Subjects</h2>
+        <form [formGroup]="subjectForm" (ngSubmit)="linkSubject()" class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start">
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>New subject</mat-label>
-            <input matInput formControlName="name" placeholder="Physics" />
+            <mat-label>Add a subject</mat-label>
+            <mat-select formControlName="subjectId">
+              @for (subject of availableSubjects(); track subject.id) {
+                <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
+              }
+            </mat-select>
           </mat-form-field>
-          <button type="submit" class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700">
-            Add subject
+          <button
+            type="submit"
+            [disabled]="availableSubjects().length === 0"
+            class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-300"
+          >
+            Add to class
           </button>
         </form>
+        @if (availableSubjects().length === 0) {
+          <p class="text-sm text-slate-500">Create subjects in Subjects & questions, then add them here.</p>
+        }
 
         @if (item.subjects.length === 0) {
-          <p class="mt-4 text-sm text-slate-500">No subjects yet.</p>
+          <p class="mt-4 text-sm text-slate-500">No subjects on this class yet.</p>
         } @else {
-          <div class="mt-6 flex flex-col gap-4">
+          <div class="mt-6 flex flex-col gap-3">
             @for (subject of item.subjects; track subject.id) {
-              <div class="rounded-xl border border-slate-200 p-5">
-                <h3 class="font-medium">{{ subject.name }}</h3>
-                @if (subject.topics.length === 0) {
-                  <p class="mt-2 text-sm text-slate-500">No topics yet.</p>
-                } @else {
-                  <ul class="mt-2 list-disc pl-5 text-sm text-slate-700">
-                    @for (topic of subject.topics; track topic.id) {
-                      <li>{{ topic.name }}</li>
+              <section class="overflow-hidden rounded-xl border border-slate-200">
+                <button
+                  type="button"
+                  (click)="toggleSubject(subject.id)"
+                  class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left hover:bg-slate-50"
+                >
+                  <span class="font-medium">{{ subject.name }}</span>
+                  <span class="text-sm text-slate-500">{{ subject.topics.length }} question sets</span>
+                </button>
+                @if (openSubjectIds().includes(subject.id)) {
+                  <div class="border-t border-slate-200 px-5 py-4">
+                    @if (subject.topics.length === 0) {
+                      <p class="text-sm text-slate-500">No question sets yet.</p>
                     }
-                  </ul>
+                    @for (topic of subject.topics; track topic.id) {
+                      <div class="border-b border-slate-100 py-3 last:border-b-0">
+                        <button type="button" (click)="toggleTopic(topic.id)" class="flex w-full items-center justify-between text-left">
+                          <span class="text-sm font-medium">{{ topic.name }}</span>
+                          <span class="text-sm text-slate-500">
+                            {{ topic.shown ? 'In assessments' : 'Hidden from assessments' }} · {{ topic.questions.length }}
+                          </span>
+                        </button>
+                        @if (openTopicIds().includes(topic.id)) {
+                          @if (topic.questions.length === 0) {
+                            <p class="mt-2 text-sm text-slate-500">No questions yet.</p>
+                          } @else {
+                            <ul class="mt-2 list-disc pl-5 text-sm text-slate-600">
+                              @for (question of topic.questions; track question.id) {
+                                <li>{{ question.prompt }} · {{ question.marks }} marks · answer {{ question.correctLetter }}</li>
+                              }
+                            </ul>
+                          }
+                        }
+                      </div>
+                    }
+                  </div>
                 }
-                <form (ngSubmit)="addTopic(subject.id)" class="mt-4 flex gap-2">
-                  <input
-                    [(ngModel)]="topicDrafts[subject.id]"
-                    [ngModelOptions]="{ standalone: true }"
-                    placeholder="New topic"
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  />
-                  <button type="submit" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50">
-                    Add topic
-                  </button>
-                </form>
-              </div>
+              </section>
             }
           </div>
         }

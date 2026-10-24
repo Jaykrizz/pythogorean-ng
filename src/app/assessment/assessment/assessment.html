@@ -12,7 +12,7 @@
     <div class="flex items-center justify-between gap-4">
       <div>
         <h1 class="text-3xl font-semibold tracking-tight">Assessments</h1>
-        <p class="mt-2 text-sm text-slate-600">A test for one class topic.</p>
+        <p class="mt-2 text-sm text-slate-600">A test uses one checked question set from the class.</p>
       </div>
       @if (!creating()) {
         <button
@@ -54,16 +54,21 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Topic</mat-label>
+          <mat-label>Question set</mat-label>
           <mat-select formControlName="topicId">
             @for (topic of topics(); track topic.id) {
               <mat-option [value]="topic.id">{{ topic.label }}</mat-option>
             }
           </mat-select>
           @if (form.controls.topicId.touched && form.controls.topicId.hasError('required')) {
-            <mat-error>Choose a topic</mat-error>
+            <mat-error>Choose a question set</mat-error>
           }
         </mat-form-field>
+        @if (form.controls.classId.value != null && topicsReady() && topics().length === 0) {
+          <p class="mb-4 text-sm text-slate-500">
+            No checked question sets for this class. Open Subjects & questions and check the ones that should appear here.
+          </p>
+        }
 
         <div class="flex gap-2">
           <button
@@ -91,9 +96,17 @@
     } @else {
       <ul class="mt-8 divide-y divide-slate-200 rounded-xl border border-slate-200">
         @for (item of assessments(); track item.id) {
-          <li class="px-5 py-4">
-            <p class="font-medium">{{ item.name }}</p>
-            <p class="text-sm text-slate-500">{{ item.className }} · {{ item.subjectName }} / {{ item.topicName }}</p>
+          <li class="flex items-center justify-between gap-4 px-5 py-4">
+            <div>
+              <p class="font-medium">{{ item.name }}</p>
+              <p class="text-sm text-slate-500">{{ item.className }} · {{ item.subjectName }} / {{ item.topicName }}</p>
+            </div>
+            <a
+              [routerLink]="['/assessments', item.id]"
+              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Start
+            </a>
           </li>
         }
       </ul>

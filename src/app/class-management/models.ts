@@ -5,9 +5,22 @@ export interface ClassSummary {
   subjectCount: number;
 }
 
+export interface QuestionItem {
+  id: number;
+  prompt: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+  correctLetter: string;
+  marks: number;
+}
+
 export interface TopicItem {
   id: number;
   name: string;
+  shown: boolean;
+  questions: QuestionItem[];
 }
 
 export interface SubjectItem {

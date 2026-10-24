@@ -1,0 +1,22 @@
+<nav class="mb-8 flex gap-2">
+  <a
+    routerLink="/classes"
+    class="rounded-lg px-4 py-2 text-sm font-medium"
+    [class.bg-slate-900]="!subjects()"
+    [class.text-white]="!subjects()"
+    [class.text-slate-600]="subjects()"
+    [class.bg-slate-100]="subjects()"
+  >
+    Classes
+  </a>
+  <a
+    routerLink="/classes/subjects"
+    class="rounded-lg px-4 py-2 text-sm font-medium"
+    [class.bg-slate-900]="subjects()"
+    [class.text-white]="subjects()"
+    [class.text-slate-600]="!subjects()"
+    [class.bg-slate-100]="!subjects()"
+  >
+    Subjects & questions
+  </a>
+</nav>

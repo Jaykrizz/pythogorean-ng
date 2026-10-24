@@ -1,7 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Api } from '../core/services/api';
-import { ClassDetail, ClassSummary, PersonOption, StudentCard, SubjectItem, TopicItem } from './models';
+import { ClassDetail, ClassSummary, PersonOption, StudentCard, SubjectItem } from './models';
 
 @Service()
 export class Classroom {
@@ -19,12 +19,12 @@ export class Classroom {
     return this.api.get<ClassDetail>(`/classes/${id}`);
   }
 
-  addSubject(classId: number, name: string): Observable<SubjectItem> {
-    return this.api.post<SubjectItem>(`/classes/${classId}/subjects`, { name });
+  linkSubject(classId: number, subjectId: number): Observable<SubjectItem> {
+    return this.api.post<SubjectItem>(`/classes/${classId}/subjects`, { subjectId });
   }
 
-  addTopic(subjectId: number, name: string): Observable<TopicItem> {
-    return this.api.post<TopicItem>(`/subjects/${subjectId}/topics`, { name });
+  availableSubjects(classId: number): Observable<PersonOption[]> {
+    return this.api.get<PersonOption[]>(`/classes/${classId}/available-subjects`);
   }
 
   availableStudents(classId: number): Observable<PersonOption[]> {

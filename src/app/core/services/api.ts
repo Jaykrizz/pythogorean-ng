@@ -15,6 +15,10 @@ export class Api {
     return this.http.post<T>(`${API_BASE_URL}${path}`, body);
   }
 
+  patch<T>(path: string, body: unknown): Observable<T> {
+    return this.http.patch<T>(`${API_BASE_URL}${path}`, body);
+  }
+
   getBlob(path: string): Observable<Blob> {
     return this.http.get(`${API_BASE_URL}${path}`, { responseType: 'blob' });
   }

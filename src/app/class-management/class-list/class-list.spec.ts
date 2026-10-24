@@ -3,6 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared-module';
+import { ClassSections } from '../class-sections/class-sections';
 import { ClassList } from './class-list';
 
 describe('ClassList', () => {
@@ -11,7 +12,7 @@ describe('ClassList', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SharedModule, RouterModule.forRoot([])],
+      imports: [SharedModule, RouterModule.forRoot([]), ClassSections],
       declarations: [ClassList],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();

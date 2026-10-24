@@ -1,0 +1,132 @@
+<div class="min-h-screen bg-white text-slate-900">
+  <header class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+    <a routerLink="/" class="flex items-center gap-2">
+      <mat-icon class="text-blue-600">change_history</mat-icon>
+      <span class="text-lg font-semibold tracking-tight">Pythogorean</span>
+    </a>
+    <a routerLink="/assessments" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+      All assessments
+    </a>
+  </header>
+
+  <app-teacher-tabs />
+
+  <main class="mx-auto max-w-5xl px-6 py-10">
+    @if (errorMessage(); as message) {
+      <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ message }}</div>
+    }
+
+    @if (loading()) {
+      <p class="text-sm text-slate-500">Loading assessment</p>
+    } @else if (session(); as item) {
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <section>
+          <p class="text-sm text-slate-500">{{ item.className }} · {{ item.name }}</p>
+
+          @if (question(); as current) {
+            <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ current.prompt }}</h1>
+            <p class="mt-1 text-sm text-slate-500">
+              Question {{ index() + 1 }} of {{ item.questions.length }} · {{ current.marks }} marks
+            </p>
+            <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+              @for (option of [
+                { letter: 'A', text: current.optionA },
+                { letter: 'B', text: current.optionB },
+                { letter: 'C', text: current.optionC },
+                { letter: 'D', text: current.optionD }
+              ]; track option.letter) {
+                <li
+                  class="rounded-xl border px-4 py-3 text-sm"
+                  [class.border-emerald-500]="revealed() && option.letter === current.correctLetter"
+                  [class.bg-emerald-50]="revealed() && option.letter === current.correctLetter"
+                  [class.border-slate-200]="!revealed() || option.letter !== current.correctLetter"
+                >
+                  <span class="font-semibold">{{ option.letter }}</span> {{ option.text }}
+                </li>
+              }
+            </ul>
+          } @else {
+            <h1 class="mt-2 text-3xl font-semibold tracking-tight">No questions in this set</h1>
+          }
+
+          <div class="mt-8 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
+            @for (student of item.students; track student.studentId) {
+              <div
+                class="flex aspect-square flex-col items-center justify-center rounded-xl px-1 text-center"
+                [class.bg-slate-300]="boxTone(student.studentId) === 'grey'"
+                [class.text-slate-700]="boxTone(student.studentId) === 'grey'"
+                [class.bg-blue-600]="boxTone(student.studentId) === 'blue'"
+                [class.text-white]="boxTone(student.studentId) === 'blue' || boxTone(student.studentId) === 'green'"
+                [class.bg-emerald-500]="boxTone(student.studentId) === 'green'"
+                [class.bg-amber-400]="boxTone(student.studentId) === 'yellow'"
+                [class.text-slate-900]="boxTone(student.studentId) === 'yellow'"
+              >
+                <span class="text-2xl font-semibold leading-none">{{ student.markerId }}</span>
+                <span class="mt-1 line-clamp-2 text-xs">{{ student.name }}</span>
+                @if (chosenLetter(student.studentId); as letter) {
+                  <span class="mt-1 text-xs font-medium">{{ letter }}</span>
+                }
+              </div>
+            }
+          </div>
+          @if (item.students.length === 0) {
+            <p class="mt-4 text-sm text-slate-500">This class has no students yet.</p>
+          }
+
+          <div class="mt-8 grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              (click)="previous()"
+              [disabled]="index() === 0"
+              class="rounded-lg border border-slate-300 px-4 py-3 text-sm font-medium hover:bg-slate-50 disabled:text-slate-300"
+            >
+              Previous question
+            </button>
+            <button
+              type="button"
+              (click)="seeAnswer()"
+              [disabled]="question() == null || revealed()"
+              class="rounded-lg border border-slate-300 px-4 py-3 text-sm font-medium hover:bg-slate-50 disabled:text-slate-300"
+            >
+              See answer
+            </button>
+            <button
+              type="button"
+              (click)="next()"
+              [disabled]="index() >= item.questions.length - 1"
+              class="rounded-lg border border-slate-300 px-4 py-3 text-sm font-medium hover:bg-slate-50 disabled:text-slate-300"
+            >
+              Next question
+            </button>
+          </div>
+        </section>
+
+        <aside>
+          <video
+            #camera
+            autoplay
+            muted
+            playsinline
+            class="aspect-video w-full rounded-xl bg-slate-900 object-cover"
+            [class.hidden]="!cameraReady()"
+          ></video>
+          @if (revealed()) {
+            <p class="text-sm text-slate-500">Answers are locked. The camera turns back on with the next question.</p>
+          } @else if (cameraReady()) {
+            <button
+              type="button"
+              (click)="capture()"
+              [disabled]="capturing() || question() == null"
+              class="mt-3 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-blue-300"
+            >
+              {{ capturing() ? 'Reading cards' : 'Capture' }}
+            </button>
+            <p class="mt-2 text-xs text-slate-500">Take snapshots while this question is up. See answer locks them and turns the camera off.</p>
+          } @else {
+            <p class="text-sm text-slate-500">Opening the camera</p>
+          }
+        </aside>
+      </div>
+    }
+  </main>
+</div>

@@ -18,13 +18,15 @@ export class ClassDetail implements OnInit, OnDestroy {
 
   readonly detail = signal<ClassDetailModel | null>(null);
   readonly available = signal<PersonOption[]>([]);
+  readonly availableSubjects = signal<PersonOption[]>([]);
   readonly errorMessage = signal<string | null>(null);
   readonly cardUrl = signal<string | null>(null);
   readonly cardStudentId = signal<number | null>(null);
-  readonly topicDrafts: Record<number, string> = {};
+  readonly openSubjectIds = signal<number[]>([]);
+  readonly openTopicIds = signal<number[]>([]);
 
   readonly subjectForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required, Validators.maxLength(80)]],
+    subjectId: [null as number | null, [Validators.required]],
   });
 
   readonly enrollForm = this.formBuilder.nonNullable.group({
@@ -42,33 +44,19 @@ export class ClassDetail implements OnInit, OnDestroy {
     this.clearCard();
   }
 
-  addSubject(): void {
-    if (this.subjectForm.invalid) {
+  linkSubject(): void {
+    const subjectId = this.subjectForm.controls.subjectId.value;
+    if (subjectId == null) {
       this.subjectForm.markAllAsTouched();
       return;
     }
 
-    this.classroom.addSubject(this.classId, this.subjectForm.controls.name.value.trim()).subscribe({
+    this.classroom.linkSubject(this.classId, subjectId).subscribe({
       next: () => {
-        this.subjectForm.reset();
+        this.subjectForm.reset({ subjectId: null });
         this.reload();
       },
       error: (error: unknown) => this.errorMessage.set(apiErrorMessage(error, 'Unable to add the subject')),
-    });
-  }
-
-  addTopic(subjectId: number): void {
-    const name = (this.topicDrafts[subjectId] ?? '').trim();
-    if (!name) {
-      return;
-    }
-
-    this.classroom.addTopic(subjectId, name).subscribe({
-      next: () => {
-        this.topicDrafts[subjectId] = '';
-        this.reload();
-      },
-      error: (error: unknown) => this.errorMessage.set(apiErrorMessage(error, 'Unable to add the topic')),
     });
   }
 
@@ -86,6 +74,18 @@ export class ClassDetail implements OnInit, OnDestroy {
       },
       error: (error: unknown) => this.errorMessage.set(apiErrorMessage(error, 'Unable to add the student')),
     });
+  }
+
+  toggleSubject(subjectId: number): void {
+    this.openSubjectIds.update((ids) =>
+      ids.includes(subjectId) ? ids.filter((id) => id !== subjectId) : [...ids, subjectId],
+    );
+  }
+
+  toggleTopic(topicId: number): void {
+    this.openTopicIds.update((ids) =>
+      ids.includes(topicId) ? ids.filter((id) => id !== topicId) : [...ids, topicId],
+    );
   }
 
   showCard(studentId: number): void {
@@ -108,6 +108,10 @@ export class ClassDetail implements OnInit, OnDestroy {
     this.classroom.availableStudents(this.classId).subscribe({
       next: (students) => this.available.set(students),
       error: () => this.available.set([]),
+    });
+    this.classroom.availableSubjects(this.classId).subscribe({
+      next: (subjects) => this.availableSubjects.set(subjects),
+      error: () => this.availableSubjects.set([]),
     });
   }
 
